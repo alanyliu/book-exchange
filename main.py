@@ -130,3 +130,7 @@ elif res == "add book":
     new_or_old = get_bool("'True' if book is new, 'False' otherwise:")
     owner_info = input("Enter owner ID + name separated by a space:")
     BFR.add_new_book(add_isbn, new_or_old, owner_info)
+else:
+    input("Input did not match any of the acceptable prompts, please try again."
+          "Enter 'book price' to find a book price, 'manual set' to set book price manually, "
+          "'set price' to set book price based on BookFinder, or 'add book' to add new book.")
