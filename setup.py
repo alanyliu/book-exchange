@@ -1,16 +1,33 @@
+import pandas as pd
+import math
+
 class IsbnAdder:
 
-    def __init__(self):
+    def __init__(self, url):
+        self.df = self.read_form_data(url)
 
-    def isbn_list(self, isbns):
+    def read_form_data(self, url):
+        df = pd.read_csv(url)
+        return df
+
+    def isbn_list(self):
         """
         Returns a list of distinct ISBNs to be added to the Google sheets sheet with pricing data.
         Args:
-            isbns:
-        Returns:
+            N/A
+        Returns: list(isbn_set): list representation of all unique ISBNs in data frame of master book list
         """
+
+        isbn_set = {}
+        for isbn in self.df['ISBN']:
+            isbn_set.add(isbn)
+        return list(isbn_set)
+
 
 # 2021 master book list
 sheet_id = "1EXGdFpMzucnnHVIwVRnEh8onE5Gr82aZi7wD-lWb2ww"  # "1dCgnjSlQAD8eJQxSKb85Eiul2ANbnlov3yg7w1TLmDw"
 sheet_name = "ForShinyOnly_NoEdit" # may have accessing issues
 url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
+
+IA = IsbnAdder(url)
+IA.read_form_data(url)
