@@ -12,5 +12,7 @@ Learn more about the Book Exchange here: https://sites.google.com/view/book-exch
   - pandas
   - requests
   - BeautifulSoup
+  - gspread & ServiceAccountCredentials
+  - pprint
 
-Data in format of pandas DataFrame data structure.
+Data in format of pandas DataFrame.
