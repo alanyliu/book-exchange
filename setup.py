@@ -68,4 +68,7 @@ sheet_name = "ForShinyOnly_NoEdit"  # may have accessing issues
 url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
 
 IA = IsbnAdder(url)
+# Read Google sheet to create DataFrame
 IA.read_form_data(url)
+# Update Google sheet with unique ISBNs found in master list
+IA.update_sheet()
