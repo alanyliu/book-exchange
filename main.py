@@ -20,6 +20,9 @@
 
 import pandas as pd
 import math
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import pprint
 
 
 class BuyingFormReader:
@@ -38,8 +41,27 @@ class BuyingFormReader:
         df_init = pd.read_csv(url)
         df_final = df_init([['ISBN', 'Book Name', 'Author', 'NewPriceL', 'NewPriceH', 'NewPriceMN', 'NewPriceMD',
                              'GoodPriceL', 'GoodPriceH', 'GoodPriceMN', 'GoodPriceMD', 'FairPriceL', 'FairPriceH',
-                             'FairPriceMN', 'FairPriceMD']])
+                             'FairPriceMN', 'FairPriceMD', 'Price']])
         return df_final
+
+    def authorize_api(self):
+        # authorize API
+        scope = [
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/drive.file'
+        ]
+
+        file_name = 'client_key.json'
+        creds = ServiceAccountCredentials.from_json_keyfile_name(file_name, scope)
+        client = gspread.authorize(creds)
+
+        # fetch Google sheet
+        sheet = client.open('PythonBookExchange').BookPricingTab
+        py_sheet = sheet.get_all_records()  # fetches entire sheet in JSON
+        pp = pprint.PrettyPrinter()  # beautify the JSON response
+        pp.pprint(py_sheet)
+
+        return None
 
     def get_price_of_book(self, isbn):
         """
@@ -49,13 +71,13 @@ class BuyingFormReader:
         """
         idx = 0
         for elem in self.df['ISBN']:
-            # if self.df.at[idx, 'price'] == isbn:
+            # if self.df.at[idx, 'Price'] == isbn:
             if elem == isbn:
                 break
             idx += 1
         if idx >= self.df.shape()[0]:
             return self.get_price_of_book(input("ISBN not found, please try again:"))
-        return self.df.at[idx, 'price']
+        return self.df.at[idx, 'Price']
 
     def set_price_of_book(self, isbn, new_price):
         """
@@ -71,7 +93,13 @@ class BuyingFormReader:
             idx += 1
         if idx >= self.df.shape()[0]:
             return self.get_price_of_book(input("ISBN not found, please try again:"))
-        self.df.at[idx, 'price'] = new_price
+        # update DataFrame with new price
+        self.df.at[idx, 'Price'] = new_price
+
+        # update sheet with new price
+        cell = sheet.cell(idx + 2, 17)  # indices subject to change
+        sheet.update_cell(idx + 2, 17, isbn)  # indices subject to change
+        cell = sheet.cell(idx + 2, 17)
 
     def set_price_with_bookfinder(self, isbn, quality):
         """
@@ -112,6 +140,7 @@ url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 
 BFR = BuyingFormReader(url)
 BFR.read_form_data(url)
+BFR.authorize_api()
 
 # User input
 res = input("Enter 'book price' to find a book price, 'manual set' to set book price manually, "
