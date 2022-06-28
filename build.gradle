@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation('net.sourceforge.htmlunit:htmlunit:2.51.0')
+    implementation 'com.google.apis:google-api-services-sheets:v4-rev614-1.18.0-rc'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.31.5'
+    implementation 'com.google.api-client:google-api-client:1.22.0'
+    implementation 'org.apache.commons:commons-csv:1.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
