@@ -4,15 +4,26 @@ Created by Alan Liu, Co-founder of the BISV Book Exchange.
 Start Date: Dec. 2021
 
 ## Description:
-This project overall seeks to automate the book purchasing process of textbooks at BISV by reading in data from Google sheets and scraping prices and book information off of BookFinder with Python. The current goal is to extrapolate data that may give useful insight into textbook price setting and store data for future purposes. Increased efficiency in book data storage automation will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to Alum Rock schools in California.
+The goal is to extrapolate key pricing information to work toward automating the book purchasing process of textbooks and required texts at BISV by reading in data and/or book ISBNs from a Google sheets master book list and web scraping from BookFinder with Gradle and Java. The extracted information may give useful insights into setting prices for books, as well as storing data for future purposes to avoid the need for manual price setting. Increased efficiency in the backend of the book transaction process will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to schools across the Bay Area of California.
 
-Learn more about the Book Exchange here: https://sites.google.com/view/book-exchange-portal/home?authuser=0.
+Learn more about the Book Exchange here: https://the-bobcat-book-exchange.herokuapp.com.
+
+(Legacy website: https://sites.google.com/view/book-exchange-portal/home?authuser=0)
+
+## Repositories:
+  - Maven Central (Gradle can utilize dependencies that are found in the Maven central repository)
 
 ## Dependencies:
+  - Jupiter API
+  - htmlunit
+  - Apache Commons
+  - Google API Services & OAuth-Client
+  
+A portion of the project in Python is also available in this repo. Below are the necessary dependencies: 
   - pandas
   - requests
   - BeautifulSoup
   - gspread & ServiceAccountCredentials
   - pprint
 
-Data in format of pandas DataFrame.
+Data in Commons CSV format.
