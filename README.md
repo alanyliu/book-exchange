@@ -19,7 +19,7 @@ Learn more about the Book Exchange here: https://the-bobcat-book-exchange.heroku
   - Apache Commons
   - Google API Services & OAuth-Client
   
-A portion of the project in Python is also available in this repo. Below are the necessary dependencies: 
+A portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
   - pandas
   - requests
   - BeautifulSoup
