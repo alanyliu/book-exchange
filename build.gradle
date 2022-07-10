@@ -7,6 +7,7 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
@@ -15,10 +16,12 @@ dependencies {
     implementation('net.sourceforge.htmlunit:htmlunit:2.51.0')
     implementation 'com.google.apis:google-api-services-sheets:v4-rev614-1.18.0-rc'
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.31.5'
-    implementation 'com.google.api-client:google-api-client:1.22.0'
+    implementation 'com.google.api-client:google-api-client:1.33.0'
     implementation 'org.apache.commons:commons-csv:1.9.0'
 }
 
 test {
     useJUnitPlatform()
 }
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
