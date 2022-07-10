@@ -11,13 +11,17 @@ Learn more about the Book Exchange here: https://the-bobcat-book-exchange.heroku
 (Legacy website: https://sites.google.com/view/book-exchange-portal/home?authuser=0)
 
 ## Repositories:
-  - Maven Central (Gradle can utilize dependencies that are found in the Maven central repository)
+  - Maven Central
+  - Google
+Note: Gradle can utilize dependencies that are found in the Google and/or Maven central repository.
 
 ## Dependencies:
   - Jupiter API
   - htmlunit
   - Apache Commons
-  - Google API Services & OAuth-Client
+  - Google API Services Sheet
+  - Google API Client
+  - Google OAuth Client
   
 A portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
   - pandas
