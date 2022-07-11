@@ -88,7 +88,20 @@ public class WebScraper {
     }
 
     public static HashSet<String> getISBNs() throws GeneralSecurityException, IOException {
-        return GoogleSheetsObj.readBookISBNs();
+        // Obtain ValueRange object with Google Sheets entries
+        ValueRange result = GoogleSheetsObj.readBookISBNs();
+
+        // Convert result into ArrayList with non-ISBN entries excluded
+        ArrayList<Object> objEntries = new ArrayList<>(result.values());
+        ArrayList<String> entries = new ArrayList<>();
+        for (Object val : objEntries) {
+            if (String.valueOf(val).matches("\\d+")) {
+                entries.add(String.valueOf(val));
+            }
+        }
+
+        // Return HashSet to remove duplicate ISBNs
+        return new HashSet<>(entries);
     }
 
     public static double[] webScrape(String url) {
