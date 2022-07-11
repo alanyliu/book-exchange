@@ -23,11 +23,15 @@ Note: Gradle can utilize dependencies that are found in the Google and/or Maven 
   - Google API Client
   - Google OAuth Client
   
+Data stored in Commons CSV format.
+  
 A portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
   - pandas
   - requests
   - BeautifulSoup
   - gspread & ServiceAccountCredentials
   - pprint
-
-Data in Commons CSV format.
+ 
+## Credits:
+  - Baeldung
+  - Sheets API for Google Developers
