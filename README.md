@@ -1,5 +1,5 @@
 # book-exchange
-Created by Alan Liu, Co-founder of the BISV Book Exchange. 
+Created by Alan Liu, former co-leader of the BISV Book Exchange. 
 
 Start Date: Dec. 2021
 
@@ -25,7 +25,7 @@ Note: Gradle can utilize dependencies that are found in the Google and/or Maven 
   
 Data stored in Commons CSV format.
   
-A portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
+As a side note, a portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
   - pandas
   - requests
   - BeautifulSoup
