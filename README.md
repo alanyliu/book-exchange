@@ -4,7 +4,7 @@ Created by Alan Liu, former co-leader of the BISV Book Exchange.
 Start Date: Dec. 2021
 
 ## Description:
-The goal is to extrapolate key pricing information to work toward automating the book purchasing process of textbooks and required texts at BISV by reading in data and/or book ISBNs from a Google sheets master book list and web scraping from BookFinder with Gradle and Java. The extracted information may give useful insights into setting prices for books, as well as storing data for future purposes to avoid the need for manual price setting. Increased efficiency in the backend of the book transaction process will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to schools across the Bay Area of California.
+The Java Gradle project extrapolates key pricing information to work toward automating the required textbook purchasing process at BISV by reading in data and/or book ISBNs from a Google sheets master book list and web scraping from BookFinder. The extracted information may give useful insights into setting prices for books, as well as storing data for future purposes to avoid the need for manual price setting. Increased efficiency in the backend of the book transaction process will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to schools across the Bay Area of California.
 
 Learn more about the Book Exchange here: https://the-bobcat-book-exchange.herokuapp.com.
 
@@ -24,13 +24,6 @@ Note: Gradle can utilize dependencies that are found in the Google and/or Maven 
   - Google OAuth Client
   
 Data stored in Commons CSV format.
-  
-As a side note, a portion of the project in Python is also available in this repo (see main.py, requests.py, and setup.py). Below are the necessary dependencies: 
-  - pandas
-  - requests
-  - BeautifulSoup
-  - gspread & ServiceAccountCredentials
-  - pprint
  
 ## Credits:
   - Baeldung
