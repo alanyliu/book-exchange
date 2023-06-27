@@ -2,6 +2,7 @@ package com.gradle.web.scraper;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.csv.CSVFormat;
@@ -10,98 +11,116 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 import java.security.GeneralSecurityException;
-import java.io.IOException;
-import java.io.FileReader;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.sheets.v4.*;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.*;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.services.sheets.v4.model.ValueRange;
 
 
 public class WebScraper {
-    public static void main(String[] args) throws IOException{
+    final static int totalStats = 8;
+
+    public static void main(String[] args) throws IOException, GeneralSecurityException {
+        List<List<Double>> priceStats = new ArrayList<>();
+        for (int i = 0; i < totalStats; i++) {
+            priceStats.add(new ArrayList<>());
+        }
+
         try {
-            // Create CSVPrinter class object
+            // Create instance of CSVPrinter class
             Writer writer = Files.newBufferedWriter(Paths.get("book_prices.csv"));
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT/*.withHeader("ISBN", "Avg New Price",
-                    "Low New Price", "High New Price", "Avg Used Price", "Low Used Price", "High Used Price")*/);
-            csvPrinter.printRecord("ISBN", "Avg New Price", "Low New Price", "High New Price", "Avg Used Price",
-                    "Low Used Price", "High Used Price");
+            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.builder().setHeader(
+                    "ISBN", "Low New Price", "High New Price", "Avg New Price", "Median New Price", "Low Used Price",
+                    "High Used Price", "Avg Used Price", "Median Used Price")
+                    .build());
 
             HashSet<String> bookISBNs = getISBNs();
-//            HashSet<String> bookISBNs = new HashSet<String>(Arrays.asList("9780205116140", "9780133687187",
-//                    "9780544784680", "9781524710002", "9780030647895", "0030499682", "9787559539418", "9780030647727",
-//                    "9781464156410", "9781457699917", "9780132041447", "9780321696816", "9780525568315",
-//                    "9780525569008", "9780525569442", "9780525569688", "9780471488859", "9780030941931",
-//                    "9780030941979", "9780030941955", "9781319194444", "1934780146", "9781559539418", "9780133669510",
-//                    "9780131846616"));
+            System.out.println(bookISBNs);
+
+            // Scrape book price data for each ISBN-corresponding book
             for (String isbn : bookISBNs) {
                 String url = "https://www.bookfinder.com/search/?author=&title=&lang=en&isbn=" + isbn + "&new_used=*&destination=us&currency=USD&mode=basic&st=sr&ac=qr";
                 double[] vals = webScrape(url);
-                csvPrinter.printRecord(isbn, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
+                csvPrinter.printRecord(isbn, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7]);
+                for (int i = 0; i < totalStats; i++) {
+                    priceStats.get(i).add(vals[i]);
+                }
             }
 
+            // Flush data into CSV file
             csvPrinter.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
         }
 
+        // Read and print data from CSV file
         try (
             Reader reader = Files.newBufferedReader(Paths.get("book_prices.csv"));
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
-                    /* .withHeader("ISBN", "Avg New Price", "Low New Price", "High New Price", "Avg Used Price",
-                            "Low Used Price", "High Used Price").withIgnoreHeaderCase().withTrim()*/);
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.builder().setHeader(
+                    "ISBN", "Low New Price", "High New Price", "Avg New Price", "Median New Price", "Low Used Price",
+                    "High Used Price", "Avg Used Price", "Median Used Price")
+                    .build());
         ) {
             for (CSVRecord csvRecord : csvParser) {
                 // Accessing values by the names assigned to each column
                 String isbn = csvRecord.get("ISBN");
-                String avgNewPrice = csvRecord.get("Avg New Price");
                 String lowNewPrice = csvRecord.get("Low New Price");
                 String highNewPrice = csvRecord.get("High New Price");
-                String avgUsedPrice = csvRecord.get("Avg Used Price");
+                String avgNewPrice = csvRecord.get("Avg New Price");
+                String medianNewPrice = csvRecord.get("Median New Price");
                 String lowUsedPrice = csvRecord.get("Low Used Price");
                 String highUsedPrice = csvRecord.get("High Used Price");
+                String avgUsedPrice = csvRecord.get("Avg Used Price");
+                String medianUsedPrice = csvRecord.get("Median Used Price");
 
-                System.out.println("Record No - " + csvRecord.getRecordNumber());
+                if (isbn.equals("ISBN"))
+                    continue;
+
+                // Printing data to console
+                System.out.println("Record No - " + (csvRecord.getRecordNumber() - 1));
                 System.out.println("---------------");
                 System.out.println("ISBN : " + isbn);
-                System.out.println("Avg New Price : " + avgNewPrice);
                 System.out.println("Low New Price : " + lowNewPrice);
                 System.out.println("High New Price : " + highNewPrice);
-                System.out.println("Avg Used Price : " + avgUsedPrice);
+                System.out.println("Avg New Price : " + avgNewPrice);
+                System.out.println("Median New Price : " + medianNewPrice);
                 System.out.println("Low Used Price : " + lowUsedPrice);
                 System.out.println("High Used Price : " + highUsedPrice);
+                System.out.println("Avg Used Price : " + avgUsedPrice);
+                System.out.println("Median Used Price : " + medianUsedPrice);
                 System.out.println("---------------\n\n");
             }
+        }
+
+        // Update Google Sheets file with book price statistics
+        try {
+            GoogleSheetsObj.updatePriceData(priceStats);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public static HashSet<String> getISBNs() throws GeneralSecurityException, IOException {
-        // Obtain ValueRange object with Google Sheets entries
+        // Obtain ValueRange object with ISBN entries from Google Sheets
         ValueRange result = GoogleSheetsObj.readBookISBNs();
 
         // Convert result into ArrayList with non-ISBN entries excluded
-        ArrayList<Object> objEntries = new ArrayList<>(result.values());
-        ArrayList<String> entries = new ArrayList<>();
-        for (Object val : objEntries) {
-            if (String.valueOf(val).matches("\\d+")) {
-                entries.add(String.valueOf(val));
+        ArrayList<Object> prelimISBNs = new ArrayList<>(result.getValues());
+        ArrayList<String> uniqueISBNs = new ArrayList<>();
+        for (Object val : prelimISBNs) {
+            try {
+                @SuppressWarnings("unchecked")
+                String possISBN = ((ArrayList<String>) val).get(0);
+                if (possISBN.matches("^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$")) {
+                    uniqueISBNs.add(possISBN);
+                }
+            } catch (Exception ignored) {
             }
         }
 
         // Return HashSet to remove duplicate ISBNs
-        return new HashSet<>(entries);
+        return new HashSet<>(uniqueISBNs);
     }
 
     public static double[] webScrape(String url) {
@@ -112,17 +131,17 @@ public class WebScraper {
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setPrintContentOnFailingStatusCode(false);
 
-        // total price of new/used books
-        double totalNew = 0.0;
-        double totalUsed = 0.0;
-
         // minimum price of new/used books
         double minNew = Double.POSITIVE_INFINITY;
         double minUsed = Double.POSITIVE_INFINITY;
 
         // maximum price of new/used books
-        double maxNew = 0;
+        double maxNew = 0.0;
         double maxUsed = 0.0;
+
+        // total price of new/used books
+        double totalNew = 0.0;
+        double totalUsed = 0.0;
 
         // total number of entries for new/used books
         int numNew = 0;
@@ -131,45 +150,94 @@ public class WebScraper {
         // average price of new/used books
         double avgNew = 0.0;
         double avgUsed = 0.0;
+
+        // lists for tracking the median prices
+        List<Double> newList = new ArrayList<>();
+        List<Double> usedList = new ArrayList<>();
+        double medianNew = 0.0;
+        double medianUsed = 0.0;
+
         try {
             HtmlPage page = webClient.getPage(url);
 
+            // scrape HTML tags with prices
             List<HtmlDivision> priceCol = page.getByXPath("/html/body//div[@class='yui-t7']//div[@id='bd-isbn']//div");
+
+            // scrape HTML tags with new and/or used book labels
+            int length = page.getByXPath("/html/body//div[@class='yui-t7']//div[@id='bd-isbn']//div//table//h3").size();
+            List<String> bookQualities = new ArrayList<>();
+            for (int i = 0; i < length; i++) {
+                DomElement bookQuality = (DomElement) page.getByXPath("/html/body//div[@class='yui-t7']//div[@id='bd-isbn']//div//table//h3").get(i);
+                if (bookQuality.getChildNodes().get(0).getNodeValue().toLowerCase().contains("new")) {
+                    bookQualities.add("new");
+                } else if (bookQuality.getChildNodes().get(0).getNodeValue().toLowerCase().contains("old")) {
+                    bookQualities.add("old");
+                }
+            }
 
             boolean flag = false;
             boolean isUsed = false;
+            if (bookQualities.size() == 1 && bookQualities.contains("old")) {
+                isUsed = true;
+            }
             for (int i = 0; i < priceCol.size(); i++) {
                 // break from HtmlDivision since all data is acquired
-                if (priceCol.get(i).toString().equals("HtmlDivision[<div id=\"results-group-rental\" class=\"results-group-rental\" align=\"center\">]") || priceCol.get(i).toString().equals("HtmlDivision[<div class=\"search-footer-item\">]")) {
+                if (priceCol.get(i).toString().equals("HtmlDivision[<div id=\"results-group-rental\" class=\"results-group-rental\" align=\"center\">]") ||
+                        priceCol.get(i).toString().equals("HtmlDivision[<div class=\"search-footer-item\">]")) {
                     break;
                 }
                 if (flag) {
                     double price = Double.parseDouble(priceCol.get(i).asNormalizedText().substring(1));
+                    System.out.println(price);
+
+                    // handle new book prices
                     if (!isUsed) {
+                        // update max price for new book
                         if (price > maxNew) {
                             maxNew = price;
                         }
+
+                        // update min price for new book
                         if (price < minNew) {
                             minNew = price;
                         }
+
+                        // update variables for calculating average price of new book
                         totalNew += price;
                         numNew++;
 
+                        // append new book price to newList
+                        newList.add(price);
+
                         // check if next element of data is for a used book not new book
-                        double nextPrice = Double.parseDouble(priceCol.get(i+1).asNormalizedText().substring(1));
+                        double nextPrice;
+                        try {
+                            nextPrice = Double.parseDouble(priceCol.get(i + 1).asNormalizedText().substring(1));
+                        } catch (Exception e) {
+                            break;
+                        }
                         if (price > nextPrice) {
                             isUsed = true;
                         }
                     }
+                    // handle used book prices
                     else {
+                        // update max price of used book
                         if (price > maxUsed) {
                             maxUsed = price;
                         }
+
+                        // update min price of used book
                         if (price < minUsed) {
                             minUsed = price;
                         }
+
+                        // update variables for calculating average price of new book
                         totalUsed += price;
                         numUsed++;
+
+                        // append used book price to usedList
+                        usedList.add(price);
                     }
                 }
 
@@ -179,14 +247,54 @@ public class WebScraper {
                 }
             }
 
-            avgNew = totalNew / numNew;
-            avgUsed = totalUsed / numUsed;
+            // set low and high prices for new and/or used books to -1 if none recorded
+            if (numNew == 0) {
+                maxNew = -1;
+                minNew = -1;
+            }
+            if (numUsed == 0) {
+                maxUsed = -1;
+                minUsed = -1;
+            }
 
+            // determine average prices for new and used books
+            avgNew = numNew != 0 ? totalNew / numNew : -1;
+            avgUsed = numUsed != 0 ? totalUsed / numUsed : -1;
+
+            // determine median prices for new and used books
+            if (newList.size() == 0) {
+                medianNew = -1;
+            } else {
+                Collections.sort(newList);
+                medianNew = newList.size() % 2 == 0 ? (newList.get(newList.size() / 2 - 1) + newList.get(newList.size() / 2)) / 2
+                                                    : newList.get(newList.size() / 2);
+            }
+            if (usedList.size() == 0) {
+                medianUsed = -1;
+            } else {
+                Collections.sort(usedList);
+                medianUsed = usedList.size() % 2 == 0 ? (usedList.get(usedList.size() / 2 - 1) + usedList.get(usedList.size() / 2)) / 2
+                                                      : usedList.get(usedList.size() / 2);
+            }
+
+            // cleanup
             webClient.getCurrentWindow().getJobManager().removeAllJobs();
             webClient.close();
 
         } catch (IOException e) {
             System.out.println("An error occurred: " + e);
         }
-        return new double[]{avgNew, minNew, maxNew, avgUsed, minUsed, maxUsed};
+        return new double[]{minNew, maxNew, avgNew, medianNew, minUsed, maxUsed, avgUsed, medianUsed};
     }
+
+//
+//    public static String[][] getData(String spreadSheetId, String sheetName, String rangeDataToRead) throws Exception {
+//        Sheets sheet = new Sheets(GoogleNetHttpTransport.newTrustedTransport(), JsonFactory.getDefaultInstance(), authorize());
+//
+//        List<List<Object>> data = sheet.spreadsheets().values()
+//                .get(spreadSheetId, sheetName + "!" + rangeDataToRead)
+//                .execute().getValues();
+//
+//        return convertToArray(data);
+//    }
+}
