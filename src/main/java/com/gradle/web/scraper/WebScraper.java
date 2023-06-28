@@ -35,7 +35,8 @@ public class WebScraper {
                     "High Used Price", "Avg Used Price", "Median Used Price")
                     .build());
 
-            HashSet<String> bookISBNs = getISBNs();
+            // Get all book ISBNs for scraping
+            List<String> bookISBNs = getISBNs();
             System.out.println(bookISBNs);
 
             // Scrape book price data for each ISBN-corresponding book
@@ -101,26 +102,26 @@ public class WebScraper {
         }
     }
 
-    public static HashSet<String> getISBNs() throws GeneralSecurityException, IOException {
+    public static List<String> getISBNs() throws GeneralSecurityException, IOException {
         // Obtain ValueRange object with ISBN entries from Google Sheets
         ValueRange result = GoogleSheetsObj.readBookISBNs();
 
         // Convert result into ArrayList with non-ISBN entries excluded
         ArrayList<Object> prelimISBNs = new ArrayList<>(result.getValues());
-        ArrayList<String> uniqueISBNs = new ArrayList<>();
+        ArrayList<String> retISBNs = new ArrayList<>();
         for (Object val : prelimISBNs) {
             try {
                 @SuppressWarnings("unchecked")
                 String possISBN = ((ArrayList<String>) val).get(0);
                 if (possISBN.matches("^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$")) {
-                    uniqueISBNs.add(possISBN);
+                    retISBNs.add(possISBN);
                 }
             } catch (Exception ignored) {
             }
         }
 
-        // Return HashSet to remove duplicate ISBNs
-        return new HashSet<>(uniqueISBNs);
+        // Return ArrayList with comprehensive list of ISBNs
+        return new ArrayList<>(retISBNs);
     }
 
     public static double[] webScrape(String url) {
@@ -286,15 +287,4 @@ public class WebScraper {
         }
         return new double[]{minNew, maxNew, avgNew, medianNew, minUsed, maxUsed, avgUsed, medianUsed};
     }
-
-//
-//    public static String[][] getData(String spreadSheetId, String sheetName, String rangeDataToRead) throws Exception {
-//        Sheets sheet = new Sheets(GoogleNetHttpTransport.newTrustedTransport(), JsonFactory.getDefaultInstance(), authorize());
-//
-//        List<List<Object>> data = sheet.spreadsheets().values()
-//                .get(spreadSheetId, sheetName + "!" + rangeDataToRead)
-//                .execute().getValues();
-//
-//        return convertToArray(data);
-//    }
 }
