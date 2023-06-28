@@ -2,7 +2,7 @@
 Created by Alan Liu, former co-leader of the BISV Book Exchange. 
 
 ## Description:
-This Java Gradle project extrapolates key pricing information for new and used books to help automate the process of price setting of required texts at BISV by reading in book ISBNs from a Google sheets master book list and web scraping from BookFinder for each ISBN. The extracted information can give useful insights into setting prices for books, as well as store the data for future purposes to avoid the need for manual action. Increased efficiency in the backend of the book transaction process will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to schools across the California Bay Ara.
+This Java Gradle project extrapolates key pricing information for new and used books to help automate the process of price setting of required texts at BISV by reading in book ISBNs from a Google sheets master book list and web scraping from BookFinder for each ISBN. The extracted information can give useful insights into setting prices for books, as well as store the data for future purposes to avoid the need for manual action. Increased efficiency in the backend of the book transaction process will help the Book Exchange raise funds more effectively for the school supplies drive, which donates supplies to schools across the California Bay Area.
 
 Learn more about the Book Exchange here: https://the-bobcat-book-exchange.herokuapp.com.
 
