@@ -11,7 +11,7 @@ import java.security.GeneralSecurityException;
 
 public class GoogleSheetsObj {
     private static Sheets sheetsService;
-    private static final String SPREADSHEET_ID = "***********";
+    private static final String SPREADSHEET_ID = "**********";
 
     public static void setup() throws IOException, GeneralSecurityException {
         sheetsService = SheetsServiceUtil.getSheetsService();
@@ -28,18 +28,29 @@ public class GoogleSheetsObj {
     }
 
     public static void updatePriceData(List<List<Double>> priceStats) throws IOException, GeneralSecurityException {
-//        for (int i = 0; i < priceStats.size(); i++) {
-//            List<List<Object>> temp = new ArrayList<>();
-//            for (int j = 0; j < priceStats.get(i).size(); j++) {
-//                temp.add(Arrays.asList(priceStats.get(i).get(j)));
-//            }
-//            ValueRange body = new ValueRange()
-//                    .setValues(temp)
-//                    .setMajorDimension("COLUMNS");
-//            UpdateValuesResponse result = sheetsService.spreadsheets().values()
-//                    .update(SPREADSHEET_ID, "AM", body)
-//                    .setValueInputOption("RAW")
-//                    .execute();
-//        }
+        // Pre-processing of statistics for input to update function
+        List<List<Object>> temp = new ArrayList<>();
+        for (List<Double> priceStat : priceStats) {
+            List<Object> subTemp = new ArrayList<>();
+            for (Double val : priceStat) {
+                if (val == -1) {
+                    subTemp.add("N/A");
+                } else {
+                    subTemp.add(val);
+                }
+            }
+            temp.add(subTemp);
+        }
+
+        // Set ValueRange object containing statistics to be inputted into Sheets
+        ValueRange content = new ValueRange()
+                .setValues(temp)
+                .setMajorDimension("COLUMNS");
+        
+        // Execute the update command
+        UpdateValuesResponse result = sheetsService.spreadsheets().values()
+                .update(SPREADSHEET_ID, "AM2", content)
+                .setValueInputOption("RAW")
+                .execute();
     }
 }
